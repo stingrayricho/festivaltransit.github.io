@@ -1,4 +1,4 @@
-<html lang="en">
+<html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -35,24 +35,23 @@
   </table>
 
   <script>
-    async function fetchVehiclePositions() {
-      try {
-        const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
-        const apiUrl = 'https://gtfs.adelaidemetro.com.au/v1/realtime/vehicle_positions/debug';
-        const response = await fetch(proxyUrl + apiUrl);
-        const data = await response.json();
-        const positions = data.entity.map(entity => ({
-          id: entity.id,
-          latitude: entity.vehicle.position.latitude,
-          longitude: entity.vehicle.position.longitude,
-          routeId: entity.vehicle.trip.route_id,
-          direction: entity.vehicle.trip.direction_id
-        }));
+    function fetchVehiclePositions() {
+      const apiUrl = 'https://gtfs.adelaidemetro.com.au/v1/realtime/vehicle_positions/debug?callback=processData';
+      const script = document.createElement('script');
+      script.src = apiUrl;
+      document.body.appendChild(script);
+    }
 
-        displayPositions(positions);
-      } catch (error) {
-        console.error('Error fetching vehicle positions:', error);
-      }
+    function processData(data) {
+      const positions = data.entity.map(entity => ({
+        id: entity.id,
+        latitude: entity.vehicle.position.latitude,
+        longitude: entity.vehicle.position.longitude,
+        routeId: entity.vehicle.trip.route_id,
+        direction: entity.vehicle.trip.direction_id
+      }));
+
+      displayPositions(positions);
     }
 
     function displayPositions(positions) {
